@@ -10,6 +10,10 @@ A local Windows app for AI collaboration. Continue with one model, or build visu
 
 ## Get started
 
+**Recommended: download `AI-Roundtable-0.11.6-Setup-x64.exe`.** Run the setup wizard, choose an installation folder and keep the desktop shortcut option selected. It installs for the current user without administrator privileges. Uninstalling retains user-created data and settings. Data from a separate portable installation is not imported automatically.
+
+Alternatively, use the portable ZIP:
+
 1. Open this repository's **Releases** and download **windows-x64.zip**. “Code → Download ZIP” contains source, not a ready-to-run app.
 2. Extract the **entire archive** into a writable folder.
 3. Run **AI-Roundtable.exe**. Keep all neighboring files and folders. Node.js is not required.
@@ -17,7 +21,7 @@ A local Windows app for AI collaboration. Continue with one model, or build visu
 
 To create a desktop shortcut, run **Create-Desktop-Shortcut.cmd** after extraction, or select **Create desktop shortcut** in app settings. It uses the app icon and supports paths with spaces or Chinese characters. Recreate it after moving the app folder. Do not run it inside the ZIP.
 
-Windows x64 only. This portable prerelease is unsigned, with no installer or automatic updater. Download from this repository and check SHA256SUMS.txt; do not disable system protections. No app account is required.
+Windows x64 only. Both packages are unsigned, without automatic updates. Check INSTALLER-SHA256SUMS.txt for the installer or SHA256SUMS.txt for ZIP files; do not disable system protections. No app account is required.
 
 ## Features
 
@@ -66,6 +70,8 @@ Source belongs in the repository; portable binaries belong in Releases. With Nod
 node --test tests/*.test.cjs
 ./scripts/release.ps1 -Download
 node scripts/verify-release.cjs
+# Replace the example path with this build's actual ZIP
+./scripts/build-installer.ps1 -PortableZip "dist/release-<id>/AI-Roundtable-0.11.6-windows-x64.zip" -DownloadCompiler
 ```
 
 Core tests require no third-party dependencies. The build fetches and verifies a pinned Electron runtime. Output: `dist/release-<unique-id>/`. GitHub Actions tests and builds pushes and pull requests; maintainers review and attach ZIP files and checksums to versioned Releases. Use commits, branches and pull requests for changes, updating package.json and release notes.

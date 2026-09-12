@@ -10,6 +10,10 @@
 
 ## 下载与启动
 
+**推荐普通用户下载 `AI-Roundtable-0.11.6-Setup-x64.exe`**：双击打开安装向导，选择安装目录，保留桌面快捷方式选项，安装后从桌面启动。默认按当前用户安装，无需管理员权限。卸载保留聊天与设置文件；安装版不会自动导入其他文件夹中便携版的数据。
+
+也可以选择下面的 ZIP 便携版：
+
 1. 打开本仓库 **Releases**，下载名称包含 **windows-x64.zip** 的文件。“Code → Download ZIP” 是源码，不是可直接运行的软件。
 2. **完整解压**到自己可写的目录，例如文档中的 `AI-Roundtable` 文件夹。
 3. 双击 **AI-Roundtable.exe**。保留旁边的文件和文件夹，不能只复制 EXE。无需安装 Node.js。
@@ -17,7 +21,7 @@
 
 桌面快捷方式：解压后双击 **Create-Desktop-Shortcut.cmd**，或在软件设置中点击“创建桌面快捷方式”。快捷方式使用程序当前图标，支持含空格及中文的路径。移动程序文件夹后，请从新位置重新创建。不要在压缩包内部运行。
 
-适用于 Windows x64。便携包未进行代码签名，没有安装向导和自动更新。请从本仓库下载并核对 SHA256SUMS.txt，不要禁用系统安全防护。无需注册本软件账号。
+适用于 Windows x64。安装包与便携包未进行代码签名，暂无自动更新。请从本仓库下载，分别核对 INSTALLER-SHA256SUMS.txt 或 SHA256SUMS.txt，不要禁用系统安全防护。无需注册本软件账号。
 
 ## 功能
 
@@ -66,6 +70,8 @@ API 节点生成内容，**不会直接在电脑上执行代码**。可让 API �
 node --test tests/*.test.cjs
 ./scripts/release.ps1 -Download
 node scripts/verify-release.cjs
+# 用已校验的便携 ZIP 生成安装版，替换为本次构建的实际路径
+./scripts/build-installer.ps1 -PortableZip "dist/release-<id>/AI-Roundtable-0.11.6-windows-x64.zip" -DownloadCompiler
 ```
 
 核心测试不需要第三方依赖。构建下载并校验固定版本 Electron，产物位于 `dist/release-<随机标识>/`。GitHub Actions 在推送与拉取请求时测试和构建，维护者检查产物后将 ZIP 与校验文件放入版本 Release。后续通过提交、分支和 Pull Request 迭代，并更新 package.json 版本与发布说明。

@@ -19,9 +19,16 @@ jobs:
       - run: ./scripts/release.ps1 -Download
         shell: pwsh
       - run: node scripts/verify-release.cjs
+      - name: Build EXE installer
+        shell: pwsh
+        run: |
+          $zip = Get-ChildItem dist/release-*/*-windows-x64.zip | Select-Object -First 1
+          ./scripts/build-installer.ps1 -PortableZip $zip.FullName -DownloadCompiler
       - uses: actions/upload-artifact@v4
         with:
           name: windows-portable-and-source
           path: |
             dist/release-*/*.zip
             dist/release-*/SHA256SUMS.txt
+            dist/installer-*/*-Setup-x64.exe
+            dist/installer-*/INSTALLER-SHA256SUMS.txt
