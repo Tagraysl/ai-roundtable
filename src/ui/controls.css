@@ -1,0 +1,10 @@
+.message-retry{margin-top:10px;font-size:12px}.message-meta .status-tag{max-width:75%;white-space:normal;overflow-wrap:anywhere}
+/* Shared select tokens: keep native keyboard navigation and form semantics. */
+:root{--control-bg:#f5f7fa;--control-fg:#253248;--control-border:#d6dde6;--control-focus:#398dff;--control-option:#fff}
+:root[data-theme=dark]{--control-bg:#242c3a;--control-fg:#ecf1fa;--control-border:#465165;--control-option:#242c3a}
+:root[data-style=glass],:root[data-style=liquid]{--control-bg:#ffffffa6}
+:root[data-theme=dark][data-style=glass],:root[data-theme=dark][data-style=liquid]{--control-bg:#242c3ac9}
+body select{background-color:var(--control-bg)!important;color:var(--control-fg)!important;border:1px solid var(--control-border)!important;border-radius:10px!important;outline:none!important;box-shadow:none;min-height:34px;padding:7px 10px!important;font:inherit}
+body select:focus-visible{border-color:var(--control-focus)!important;box-shadow:0 0 0 3px color-mix(in srgb,var(--control-focus) 18%,transparent)!important}
+body select option,body select optgroup{background:var(--control-option);color:var(--control-fg)}
+body select:disabled{opacity:.5;cursor:not-allowed}

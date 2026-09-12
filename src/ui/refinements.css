@@ -1,0 +1,15 @@
+.sidebar #discussion-nav,.sidebar #workflow-nav{width:100%;text-align:center;min-height:40px;border-radius:12px}
+.sidebar #sidebar-network,.sidebar #preferences-open{width:100%;text-align:center;min-height:36px;margin:0;padding:8px 12px}
+#workflow-team{display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:12px 0;flex-shrink:0;font-size:12px;max-height:130px;overflow:auto}
+#workflow-team[hidden]{display:none}#workflow-team strong{font-size:11px;font-weight:500;margin-right:4px}
+.workflow-team-chip{padding:6px 11px;border-radius:20px;background:color-mix(in srgb,#0071e3 10%,transparent);border:1px solid color-mix(in srgb,#0071e3 22%,transparent)}
+.workflow-team-warning{color:#b46a16;font-size:11px}html[data-theme=dark] .workflow-team-warning{color:#f0bb6e}
+#wf-viewport{overflow:scroll}
+.sidebar #home-nav,.sidebar #workflow-nav,.sidebar #discussion-nav{display:block;width:100%;min-height:40px;margin:6px 0;padding:10px 14px;text-align:center;border:1px solid color-mix(in srgb,currentColor 16%,transparent);border-radius:12px;background:color-mix(in srgb,var(--paper) 70%,transparent);color:inherit;box-shadow:none}
+.sidebar :is(#home-nav,#workflow-nav,#discussion-nav).nav-current{border-color:#68a6ed!important;background:color-mix(in srgb,#0071e3 12%,transparent)!important}
+.sidebar #new-room.discussion-create{width:calc(100% - 24px);margin:4px 0 12px 12px;padding:8px 12px;min-height:32px;border:0;border-left:2px solid color-mix(in srgb,currentColor 22%,transparent);border-radius:0;background:transparent;box-shadow:none;text-align:left;font-size:12px;color:inherit}
+.sidebar #new-room.discussion-create:hover{background:color-mix(in srgb,#0071e3 9%,transparent)}
+.sidebar #skills-open{width:100%;text-align:center;min-height:36px;margin:0;padding:8px 12px}
+.sidebar{--navigation-surface:#ffffffb3}
+html[data-theme=dark] .sidebar{--navigation-surface:#232a35b3}
+.sidebar :is(#home-nav,#workflow-nav,#discussion-nav){background:var(--navigation-surface)!important;color:inherit!important}

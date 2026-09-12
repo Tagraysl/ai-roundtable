@@ -1,0 +1,27 @@
+name: Verify and build
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test tests/*.test.cjs
+      - run: ./scripts/release.ps1 -Download
+        shell: pwsh
+      - run: node scripts/verify-release.cjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-portable-and-source
+          path: |
+            dist/release-*/*.zip
+            dist/release-*/SHA256SUMS.txt

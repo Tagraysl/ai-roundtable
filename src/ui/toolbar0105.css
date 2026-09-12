@@ -1,0 +1,9 @@
+html body #workflow .wf-toolbar{flex-wrap:nowrap;overflow-x:auto;overflow-y:visible}
+html body #workflow .workflow-more{flex-shrink:0;width:max-content;height:44px;white-space:nowrap}
+html body #workflow .workflow-more[open]{display:flex;align-items:center;gap:10px}
+html body #workflow .workflow-more>div{position:static;display:none;min-width:0;padding:0;border:0;background:none;box-shadow:none;border-radius:0;gap:10px}
+html body #workflow .workflow-more[open]>div{display:flex;align-items:center}
+html body #workflow .workflow-more>div>button{height:44px;min-height:44px;box-sizing:border-box;padding:0 14px;margin:0;border:1px solid var(--line);border-radius:12px;background:var(--control-bg);text-align:center;white-space:nowrap;font-size:12px}
+html body #workflow .wf-toolbar>input{flex-shrink:0;width:200px}html body #workflow .wf-toolbar>button,html body #workflow .wf-toolbar>select{flex-shrink:0}html body #workflow .wf-toolbar #wf-dirty{white-space:nowrap}
+
+html body #workflow .workflow-more>summary::after{content:'›';font-family:inherit;font-size:1em;line-height:1;transform:none}html body #workflow .workflow-more[open]>summary::after{content:'‹'}html body #workflow .workflow-more>summary{font-family:var(--app-font,"Segoe UI","Microsoft YaHei UI",sans-serif)!important;font-size:12px}

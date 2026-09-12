@@ -1,0 +1,10 @@
+html body #conversation-controls{display:flex;align-items:flex-end;flex-wrap:wrap;gap:12px;padding:16px 0}
+html body #conversation-controls>label{display:flex;flex-direction:column;align-items:stretch;gap:7px;min-width:140px;flex:1;margin:0;font-size:12px}
+html body #conversation-controls>label[hidden]{display:none!important}
+html body #conversation-controls :is(select,.model-select-button),html body #conversation-controls>button{box-sizing:border-box;height:44px;min-height:44px;margin:0;padding:0 14px;border-radius:13px;line-height:20px;font-size:12px}
+html body #conversation-controls .model-select-button{width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html body #conversation-controls select[hidden]{display:none!important}
+html[data-style=glass][data-background=custom] body{background:radial-gradient(ellipse 80% 90% at 2% 98%,color-mix(in srgb,var(--user-background) 65%,#58c9d7),transparent 68%),radial-gradient(ellipse 85% 100% at 100% 0%,color-mix(in srgb,var(--user-background) 65%,#7970d9),transparent 72%),radial-gradient(ellipse 75% 70% at 75% 95%,#f7decc,transparent 72%),linear-gradient(120deg,#edf3f7,color-mix(in srgb,var(--user-background) 40%,#ffffff))!important}
+html[data-style=glass][data-theme=dark][data-background=custom] body{background:radial-gradient(ellipse 85% 100% at 0% 100%,color-mix(in srgb,var(--user-background) 32%,#164357),transparent 70%),radial-gradient(ellipse 90% 110% at 100% 0%,color-mix(in srgb,var(--user-background) 35%,#322c59),transparent 73%),linear-gradient(120deg,#131c29,#242638)!important}
+
+html[data-usage=solo] .participants,html[data-usage=solo] .round-control,html[data-usage=solo] #summary,html[data-usage=workflow] .participants{display:none!important}

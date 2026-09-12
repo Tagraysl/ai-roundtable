@@ -1,0 +1,6 @@
+header,.participants,.composer,.materials,.notice{flex-shrink:0}
+.messages{min-height:0}
+#manual-dialog label{display:flex;flex-direction:column;gap:8px;margin:14px 0;font-size:13px}
+#manual-dialog textarea{box-sizing:border-box;width:100%;padding:12px;font:14px/1.6 'Microsoft YaHei',sans-serif;color:#243c37;background:#fff;border:1px solid #ced8d1;border-radius:10px;resize:vertical}
+#manual-dialog #manual-prompt{height:135px;background:#f3f6f1}
+#manual-dialog #manual-reply{height:145px}

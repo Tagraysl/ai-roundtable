@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "同桌 AI 网页桥",
+  "description": "把你选中的 AI 网页连接到本机同桌 AI 讨论室。仅在你连接的标签页收发讨论。",
+  "version": "0.1.0",
+  "permissions": ["storage", "activeTab", "scripting"],
+  "host_permissions": ["http://127.0.0.1/*"],
+  "optional_host_permissions": ["https://*/*"],
+  "background": {"service_worker": "worker.js"},
+  "action": {"default_popup": "popup.html"}
+}

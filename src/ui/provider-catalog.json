@@ -1,0 +1,12 @@
+{
+  "deepseek": {"name":"DeepSeek 官方","base":"https://api.deepseek.com","format":"openai","model":"deepseek-v4-pro","vision":false,"docs":"https://api-docs.deepseek.com/"},
+  "deepseek_vision": {"name":"DeepSeek 官方 · 视觉实验模型","base":"https://api.deepseek.com","format":"openai","model":"deepseek-v4-flash-vision-exp","vision":true,"docs":"https://api-docs.deepseek.com/"},
+  "kimi": {"name":"Kimi / 月之暗面","base":"https://api.moonshot.cn/v1","format":"openai","model":"","vision":false,"docs":"https://platform.kimi.com/docs/api/overview"},
+  "qwen": {"name":"通义千问 / 阿里云百炼（北京）","base":"https://dashscope.aliyuncs.com/compatible-mode/v1","format":"openai","model":"","vision":false,"docs":"https://help.aliyun.com/zh/model-studio/base-url","note":"使用北京地域的按量付费 API Key；其他地域请修改地址。"},
+  "glm": {"name":"智谱 GLM（按量 API）","base":"https://open.bigmodel.cn/api/paas/v4","format":"openai","model":"","vision":false,"docs":"https://docs.bigmodel.cn/cn/guide/develop/http/introduction"},
+  "doubao": {"name":"豆包 / 火山方舟（北京）","base":"https://ark.cn-beijing.volces.com/api/v3","format":"openai","model":"","vision":false,"docs":"https://www.volcengine.com/docs/82379/1795150","note":"填写支持 Chat Completions 的模型 ID 或您创建的推理接入点 ID。"},
+  "minimax": {"name":"MiniMax（国内）","base":"https://api.minimaxi.com/v1","format":"openai","model":"","vision":false,"docs":"https://platform.minimaxi.com/docs/guides/text-chat"},
+  "openai": {"name":"OpenAI 官方 API","base":"https://api.openai.com/v1","format":"openai","model":"","vision":false,"docs":"https://platform.openai.com/docs/overview"},
+  "anthropic": {"name":"Claude / Anthropic 官方 API","base":"https://api.anthropic.com/v1","format":"anthropic","model":"","vision":true,"docs":"https://platform.claude.com/docs/en/api/overview","note":"Claude Pro 网页订阅不等于 API 额度；网页用户请选择网页接入。"},
+  "gemini": {"name":"Gemini / Google AI Studio","base":"https://generativelanguage.googleapis.com/v1beta/openai","format":"openai","model":"","vision":false,"docs":"https://ai.google.dev/gemini-api/docs/openai"}
+}

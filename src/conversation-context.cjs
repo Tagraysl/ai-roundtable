@@ -1,0 +1,2 @@
+function view(room,{start=room.messages.length}={}){const mode=room.contextMode||'continue',chosen=new Set(room.contextMessageIds||[]);return {...room,messages:room.messages.filter((m,i)=>i>=start||mode==='continue'||(mode==='custom'&&chosen.has(m.id))),materials:(room.materials||[]).filter(m=>mode==='continue'||(mode==='custom'&&(room.contextMaterialIds||[]).includes(m.attachmentId||m.id)))};}
+module.exports={view};

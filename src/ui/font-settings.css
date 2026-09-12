@@ -1,0 +1,2 @@
+html body,html body *:not(pre):not(code):not(pre *):not(code *){font-family:var(--app-font,"Segoe UI","Microsoft YaHei UI",sans-serif)!important}
+.font-settings{border-bottom:1px solid var(--line);padding:8px 0 18px;margin-bottom:18px}.font-settings label{display:block;margin:12px 0}.font-settings select{display:block;width:100%;margin-top:8px}.font-preview{padding:14px;border:1px solid var(--line);border-radius:12px;line-height:1.7}

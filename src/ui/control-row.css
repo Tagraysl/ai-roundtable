@@ -1,0 +1,6 @@
+html body #conversation-controls{align-items:center!important;column-gap:22px!important;row-gap:12px!important}
+html body #conversation-controls>label{display:flex!important;flex-direction:row!important;align-items:center!important;gap:12px!important;flex:0 1 auto!important;min-width:0!important;white-space:nowrap;margin:0!important}
+html body #conversation-controls>label[hidden]{display:none!important}
+html body #conversation-controls>label>select,html body #conversation-controls>label>.model-select-button{width:clamp(150px,16vw,230px)!important;min-width:150px;flex:0 1 auto;margin:0!important}
+html body #conversation-controls>label>select[hidden]{display:none!important}
+html body #conversation-controls>button{flex-shrink:0}

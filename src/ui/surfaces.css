@@ -1,0 +1,15 @@
+/* Keep control boxes AND their baselines aligned across theme overrides. */
+html body #workflow .wf-toolbar{align-items:center;gap:10px;padding:14px;min-height:0}
+html body #workflow .wf-toolbar>input,html body #workflow .wf-toolbar>select,html body #workflow .wf-toolbar>button,html body #workflow .workflow-more>summary{height:44px!important;min-height:44px!important;max-height:44px!important;box-sizing:border-box;margin:0!important;line-height:20px;padding:0 14px;border-radius:12px}
+html body #workflow .workflow-more{display:block;align-self:center;padding:0!important;margin:0!important;line-height:20px;height:44px;min-height:0;border:0}
+html body #workflow .workflow-more>summary{display:flex;align-items:center;list-style:none}
+.background-colors{border-top:1px solid var(--line);margin-top:18px;padding-top:4px}.background-swatches{display:flex;gap:10px;margin:12px 0}
+html[data-background=custom] body{background:radial-gradient(ellipse at 15% 90%,var(--user-background),transparent 70%),linear-gradient(125deg,#f7f8fa,var(--user-background))!important}
+html[data-background=custom][data-theme=dark] body{background:radial-gradient(ellipse at 15% 90%,color-mix(in srgb,var(--user-background) 38%,#101318),transparent 70%),#13161d!important}
+html[data-background=custom] :is(main,#home-view,#workflow){background:transparent!important}
+html[data-background=custom][data-style=liquid] #liquid-background{background:var(--user-background)}html[data-background=custom][data-style=liquid] #liquid-background i{mix-blend-mode:luminosity}
+html body .sidebar{background:rgba(244,246,250,.78)!important;border-right:1px solid #c7ced9;box-shadow:6px 0 24px #24334b09;backdrop-filter:blur(24px)}
+html[data-theme=dark] body .sidebar{background:rgba(23,28,38,.9)!important;border-color:#414959}
+.sidebar-settings{border:1px solid #cdd4df;border-radius:16px;background:#ffffff70;padding:8px;margin:12px 0}.sidebar-settings>button{display:block;width:100%;font-size:13px;padding:10px;border-radius:9px;color:var(--ink)!important}.sidebar-settings .theme-picker{margin:8px 0 0;padding:10px 4px 2px;border-top:1px solid #cdd4df}.sidebar-settings .theme-picker select{max-width:115px}
+html[data-theme=dark] .sidebar-settings{background:#ffffff06;border-color:#414959}html[data-theme=dark] .sidebar-settings>button{color:#e5e9ef!important}
+html body #workflow .wf-toolbar{border:1px solid #cdd4df;box-shadow:0 4px 14px #22334c08}html body #workflow .wf-body{border:1px solid #bcc7d6;border-radius:18px;overflow:hidden;box-shadow:0 8px 28px #22334c0c}html body #workflow .wf-inspector{border-left:1px solid #bcc7d6}html[data-theme=dark] body #workflow :is(.wf-toolbar,.wf-body,.wf-inspector){border-color:#465063}
