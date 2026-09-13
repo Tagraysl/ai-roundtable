@@ -12,7 +12,7 @@
  window.attachmentUI={open:async(s,cb)=>{scope=s;onChange=cb;selected=null;status('');await refresh();if(!dialog.open)dialog.showModal();}};
  $('attach').textContent='＋ 附件 / 资料';
  // API image support is explicitly configurable; text-only remains the default.
- const option=el('label');option.className='inline';const check=el('input');check.type='checkbox';check.id='member-vision';option.append(check,document.createTextNode('此 API 模型支持图像输入（发送图片 / PDF 页面图）'));$('member-format').closest('[data-kind]').append(option,el('p','请以所选模型的实际能力为准；未开启时只发送提取文字。'));
+ const option=el('label');option.className='inline';const check=el('input');check.type='checkbox';check.id='member-vision';option.append(check,document.createTextNode('此 API 模型支持图像输入（发送图片 / PDF 页面图）'));$('member-format').closest('[data-kind]').append(option,el('p','图像发送取决于具体模型能力；待确认状态不代表不支持。'));
  // The manual web relay never manipulates the website or its upload controls.
  const box=el('div');box.id='manual-files';$('manual-status').before(box);
  let last='';setInterval(async()=>{try{const job=await call('manualStatus'),key=job?.id||'';if(key===last)return;last=key;box.replaceChildren();if(!job?.manualFiles?.length)return;box.append(el('p','这些附件需要你在原网页手动上传：'));for(const a of job.manualFiles){const b=el('button',a.name+' ↗');b.onclick=action(()=>call('attachmentReveal',{id:a.id}));box.append(b);}const l=el('label');l.className='inline';const c=el('input');c.type='checkbox';c.id='manual-files-uploaded';l.append(c,document.createTextNode('我已在原网页上传这些附件，再粘贴下面的回复'));box.append(l);}catch{}},600);

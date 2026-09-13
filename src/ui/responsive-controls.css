@@ -1,0 +1,33 @@
+/* Keep actions reachable when text grows or the window gets shorter. */
+html body .sidebar{overflow-y:auto;min-height:0;}
+html body .sidebar>*{flex-shrink:0;}
+html body .sidebar #rooms{flex:1 0 100px;}
+html body main{min-height:0;overflow-y:auto;}
+html body main>header{flex-wrap:wrap;}
+html body .header-actions,html body .composer-bottom,html body .send-actions,
+html body .form-actions,html body .form-row,html body .section-row,
+html body .wf-actions{flex-wrap:wrap;gap:10px;}
+html body .composer{flex-shrink:0;}
+html body dialog{max-width:calc(100vw - 28px);}
+html body dialog .dialog-head h2{overflow-wrap:anywhere;}
+html body dialog .settings-layout>*{min-width:0;}
+html body .input-action{flex-wrap:wrap;}
+html body .input-action>input,html body .input-action>select{flex:1 1 160px;min-width:0;}
+html body #workflow{overflow-y:auto;min-height:0;}
+html body #workflow .wf-top{flex-wrap:wrap;gap:10px;}
+html body #workflow .wf-toolbar{flex-wrap:wrap;overflow:visible;}
+html body #workflow .workflow-more{height:auto;max-width:100%;white-space:normal;}
+html body #workflow .workflow-more[open],html body #workflow .workflow-more[open]>div{flex-wrap:wrap;}
+html body #workflow .workflow-more>div>button{height:auto;min-height:44px;padding:10px 14px;}
+html body #workflow .wf-toolbar>input{max-width:100%;}
+html body #workflow .wf-body{flex-shrink:0;}
+html body #conversation-controls>label{flex-wrap:wrap!important;row-gap:6px!important;}
+html body .round-control{flex-wrap:wrap;}
+html body .round-control{align-items:center;}
+html body .round-control>label,html body .round-control>select,html body .round-control>span{margin:0!important;align-self:center;}
+html body button,html body summary{overflow-wrap:break-word;}
+html body.fullscreen-active{padding-top:56px;}
+html body #api-connection-picker>div{display:grid!important;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;}
+html body #api-connection-picker #api-current-connection{width:100%!important;min-width:0!important;margin:0;}
+html body #api-delete-connection{margin:0;min-height:44px;padding:8px 14px;background:var(--control-bg);border:1px solid var(--line);color:var(--ink);}
+@media(max-width:1050px){html body dialog .settings-layout{grid-template-columns:130px minmax(0,1fr);gap:14px;}html body main>header h1{max-width:100%;}}

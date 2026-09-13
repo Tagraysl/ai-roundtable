@@ -32,6 +32,10 @@ function validateMember(m) {
     }
   }
   if (m.kind === 'api' && (!m.model?.trim() || !['openai','anthropic'].includes(m.format))) throw Error('请填写 API 模型名称及协议。');
+  if(m.kind==='api'){
+    if(m.apiConcurrency!==undefined&&(!Number.isInteger(m.apiConcurrency)||m.apiConcurrency<1||m.apiConcurrency>3))throw Error('API concurrency must be between 1 and 3.');
+    if(m.apiPool!==undefined&&(!Array.isArray(m.apiPool)||m.apiPool.length>19||m.apiPool.some(id=>typeof id!=='string'||id.length>100)))throw Error('Invalid API connection pool.');
+  }
   if (m.kind === 'terminal' && (!path.isAbsolute(m.executable || '') || !Array.isArray(m.args) || !m.args.every(a => typeof a === 'string'))) throw Error('终端接入需要可执行程序的绝对路径及 JSON 参数数组。');
   if (['terminal','codex'].includes(m.kind) && /\.(cmd|bat|ps1)$/i.test(m.executable || '')) throw Error('请选择 .exe 程序。脚本请通过 node.exe、python.exe 等解释器及参数启动。');
   return structuredClone(m);

@@ -1,0 +1,3 @@
+function isFinalContributor(graph,id){const seen=new Set();function reaches(current){if(seen.has(current))return false;seen.add(current);return graph.edges.filter(e=>e[0]===current).some(([,to])=>{const n=graph.nodes.find(n=>n.id===to);return n?.type==='output'||n?.type==='merge'&&reaches(to);});}return reaches(id);}
+const instruction='你是最终输出前的交付节点。完成当前职责后，必须给出用户可以直接阅读的最终答复，而不只审查其他报告，也不要把回答推给不存在的后续节点。请以“结论、依据与来源、可靠性、未解决事项”组织结尾：直接回应原始问题；区分已经核验的事实、仅供参考的估计、未知内容；可靠性用高/中/低/无法评定并解释依据，不得把多模型一致当成独立证据或给出虚构置信百分比。没有来源的数字不能升级为可靠结果。若目前无法得出数值，明确结论为尚未查得可靠数值，列出最关键的证据缺口与可执行下一步，不要用冗长审查替代答复。';
+module.exports={isFinalContributor,instruction};

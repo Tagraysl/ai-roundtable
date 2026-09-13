@@ -1,0 +1,7 @@
+const test=require('node:test'),assert=require('node:assert/strict');const {WorkflowRunner}=require('../src/workflow.cjs');
+test('independent nodes using same API model overlap; ready dependent starts without waiting for unrelated branch',async()=>{
+ const graph={id:'speed',version:1,name:'speed',roles:{},nodes:[{id:'i',type:'input',title:'input'},...['a1','a2','b','next'].map(id=>({id,type:'ai',title:id,binding:id==='b'?'b':'a'})),{id:'o',type:'output',title:'output'}],edges:[['i','a1'],['i','a2'],['i','b'],['a1','next'],['next','o'],['a2','o'],['b','o']]};
+ const started=[],release={};let events=0;const runner=new WorkflowRunner({send:p=>{const id=p.prompt.match(/当前职责：(\w+)/)[1];started.push(id);for(let i=0;i<200;i++)p.onText('chunk '+i);return new Promise(r=>release[id]=()=>r({text:id+' done'}));},confirm:async()=>{},persist:()=>{},emit:()=>events++});
+ const task=runner.run(graph,[{id:'a',kind:'api',model:'same'},{id:'b',kind:'api'}],{task:'test'});
+ try{await new Promise(r=>setImmediate(r));assert.deepEqual(started.sort(),['a1','a2','b']);assert(events<40,'burst text should not emit hundreds of graph snapshots');release.a1();await new Promise(r=>setImmediate(r));assert(started.includes('next'));assert.equal(runner.active.run.nodes.a2.status,'running');release.next();release.a2();release.b();const r=await task;assert.equal(r.status,'complete');assert.match(r.nodes.o.text,/next done/);}finally{runner.stop();Object.values(release).forEach(fn=>fn());await task;}
+});

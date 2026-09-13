@@ -1,0 +1,16 @@
+/* Shared control geometry; content scrolls within fields, never resizes layouts. */
+html body textarea{resize:none!important;overflow:auto;}
+html body :is(#home-nav,#workflow-nav,#discussion-nav){display:flex;align-items:center;justify-content:center;min-height:46px;padding:10px 16px;margin:8px 0;border-radius:14px;line-height:1.35;font-weight:500;}
+html body :is(button,select,input:not([type=checkbox]):not([type=radio]),summary){line-height:1.4;}
+html body button:focus-visible,html body summary:focus-visible{outline:2px solid var(--accent,#007aff);outline-offset:3px;}
+html body dialog .help{line-height:1.65;max-width:72ch;}
+html body .form-row>label{min-width:180px;}
+html body :is(#api-key-status,#api-vision-status){font-size:12px;line-height:1.6;margin:10px 0;color:var(--muted);}
+html body #api-connection-picker{padding:14px;border:1px solid var(--line);border-radius:14px;margin:16px 0;background:var(--control-bg);}
+html body #api-pool-advanced{border-top:1px solid var(--line);padding-top:10px;}
+/* Shared page shell keeps edges stationary when switching workspaces. */
+html body>main,html body>#workflow{padding:20px 24px 16px;min-width:0;scrollbar-gutter:stable;}
+html body>main>header{margin-top:0;}
+html body>main>:is(header,.composer,.participants,#conversation-controls,.room-workflow-bar),
+html body>#workflow>:is(.wf-top,.wf-toolbar,.wf-body,.wf-navigation){width:100%;max-width:none;box-sizing:border-box;align-self:stretch;}
+@media(prefers-reduced-motion:reduce){html body *,html body *::before,html body *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important;}}

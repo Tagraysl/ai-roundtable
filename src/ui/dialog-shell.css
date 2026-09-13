@@ -1,0 +1,21 @@
+html body dialog.sheet-dialog{padding:0!important;overflow:hidden!important;background:#f6f7f9!important;border-radius:18px!important;max-height:90vh;}
+html body dialog.sheet-dialog[open]{display:flex;flex-direction:column;}
+html body dialog.sheet-dialog>.dialog-head{position:relative!important;top:auto!important;flex:0 0 auto;width:100%;margin:0!important;padding:16px 20px!important;min-height:76px;box-sizing:border-box;border-radius:0!important;box-shadow:none!important;border:0;border-bottom:1px solid var(--line);background:#f6f7f9!important;backdrop-filter:none!important;gap:16px;}
+html body dialog.sheet-dialog>.dialog-body{padding:20px;overflow:auto;min-height:0;flex:1 1 auto;scrollbar-gutter:stable;}
+html body dialog.sheet-dialog .dialog-head h2{font-size:22px;margin:4px 0;line-height:1.3;}
+html body .window-nav-button{min-height:40px;min-width:64px;padding:8px 14px!important;border:1px solid var(--line)!important;border-radius:10px!important;background:var(--control-bg)!important;box-shadow:none!important;font-size:13px;font-weight:500;line-height:1.4;align-self:center;}
+html body dialog :is(input:not([type=checkbox]):not([type=radio]):not([type=hidden]):not([type=color]),select,button){box-sizing:border-box;font-size:13px;line-height:1.4;}
+html body dialog :is(input:not([type=checkbox]):not([type=radio]):not([type=hidden]):not([type=color]),select){height:max(44px,2.8em)!important;min-height:44px;max-height:none;padding:8px 12px!important;}
+html body dialog :is(.form-row,.role-template-save,.input-action){align-items:center;gap:10px;}
+html body dialog .form-row>label{margin:0;}
+html body dialog .form-row{margin-bottom:14px;}
+html body dialog .form-row>label>:is(input,select){margin-top:8px!important;}
+html body dialog .role-template-save>:is(input,button){height:max(44px,2.8em);margin:0!important;padding:8px 12px;}
+html body dialog .role-template-save{flex-wrap:wrap;}
+html body dialog .role-template-save>input{flex:1 1 200px;}
+html body dialog .role-template-save>button{flex:0 0 auto;}
+html body #member-models-manage{margin:10px 0 14px;min-height:44px;}
+html body dialog .model-actions{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:center;}
+html body dialog .model-actions>:is(select,button){width:auto!important;min-width:0;height:max(44px,2.8em);margin:0!important;}
+@media(max-width:1050px){html body dialog .model-actions{grid-template-columns:1fr 1fr;}html body dialog .model-actions>select{grid-column:1/-1;width:100%!important;}}
+html[data-theme=dark] body dialog.sheet-dialog,html[data-theme=dark] body dialog.sheet-dialog>.dialog-head{background:#20242d!important;}

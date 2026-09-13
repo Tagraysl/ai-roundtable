@@ -1,9 +1,9 @@
 (()=>{
  const $=id=>document.getElementById(id),make=(tag,text)=>{const e=document.createElement(tag);if(text)e.textContent=text;return e;};
- const home=make('section');home.id='home-view';home.innerHTML='<div class="eyebrow">同桌 AI</div><h1>让 AI 一起完成任务</h1><p>首次使用：配置成员 → 选择讨论方式 → 发起任务。</p><div class="home-cards"><button id="home-members"><strong>1　配置 AI</strong><span>选择服务商，连接你的成员</span></button><button id="home-chat"><strong>2　快速讨论</strong><span>选择两位或更多 AI，直接开始聊天</span></button><button id="home-workflow"><strong>3　工作流</strong><span>使用内置工作流，或自己搭建流程</span></button></div><p class="help">已有讨论可从左侧打开。切换页面会保留当前画布和输入。</p>';
+ const home=make('section');home.id='home-view';home.innerHTML='<div class="eyebrow">同桌 AI</div><h1>让 AI 一起完成任务</h1><p>首次使用：管理 AI → 选择讨论方式 → 发起任务。</p><div class="home-cards"><button id="home-members"><strong>1　管理 AI</strong><span>选择服务商，连接你的成员</span></button><button id="home-chat"><strong>2　讨论室</strong><span>选择两位或更多 AI，直接开始聊天</span></button><button id="home-workflow"><strong>3　工作流</strong><span>使用内置工作流，或自己搭建流程</span></button></div><p class="help">已有讨论可从左侧打开。切换页面会保留当前画布和输入。</p>';
  document.body.append(home);
  function openHome(){document.querySelector('main').hidden=true;$('workflow').hidden=true;$('workflow-nav').classList.remove('active');home.hidden=false;}
- const nav=make('button','⌂　主页');nav.id='home-nav';nav.className='new-room';$('workflow-nav').before(nav);nav.onclick=openHome;
+ const nav=make('button','主页');nav.id='home-nav';nav.className='new-room';$('workflow-nav').before(nav);nav.onclick=openHome;
  const back=make('button','← 返回主页');back.id='wf-home';$('wf-members').before(back);back.onclick=openHome;
  $('home-members').onclick=()=>$('settings').click();$('home-chat').onclick=()=>$('discussion-nav').click();$('home-workflow').onclick=()=>$('workflow-nav').click();
  const edit=make('button','积木工具箱 · 展开');edit.id='wf-edit-mode';$('wf-members').before(edit);const palette=document.querySelector('.wf-palette');palette.hidden=true;$('workflow').classList.add('wf-simple');edit.onclick=()=>{palette.hidden=!palette.hidden;$('workflow').classList.toggle('wf-simple',palette.hidden);edit.textContent=palette.hidden?'积木工具箱 · 展开':'积木工具箱 · 收起';edit.setAttribute('aria-expanded',String(!palette.hidden));};

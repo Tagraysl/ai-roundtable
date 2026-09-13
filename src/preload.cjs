@@ -10,6 +10,9 @@ allowed.add('appIcon');for(const n of ['modelCatalog','modelCatalogSave','modelC
 allowed.add('roomOptions');allowed.add('roomHandoff');allowed.add('roomAdoptAttachment');allowed.add('dataLocation');allowed.add('dataLocationChoose');
 allowed.add('deleteRoom');
 allowed.add('desktopShortcut');
+allowed.add('modelCapability');
+allowed.add('windowState');allowed.add('windowAction');
+for(const name of ['membersState','workflowPoll','workflowCatalogState','workflowErrorState'])allowed.add(name);
 allowed.add('steeringStatus');
 allowed.add('steer');
 allowed.add('skipMember');

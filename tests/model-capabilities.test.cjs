@@ -1,0 +1,2 @@
+const test=require('node:test'),assert=require('node:assert/strict'),{capability}=require('../src/model-capabilities.cjs');
+test('image capability is exact model and endpoint based, unknown is not unsupported',()=>{const m={baseUrl:'https://api.deepseek.com/v1',format:'openai',model:'deepseek-flash'};assert.equal(capability(m).status,'supported');assert.equal(capability({...m,model:'unlisted'}).status,'unknown');assert.equal(capability({...m,baseUrl:'https://other.example/v1'}).status,'unknown');});

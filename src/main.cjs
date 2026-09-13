@@ -63,6 +63,8 @@ const handlers={
   webWindowDetect:async({member})=>{assertIdle();const m=wizardMember(member);return webWindow.window(m).webContents.executeJavaScript('('+require('./web-recognize.cjs').recognize.toString()+')()');},
   webWindowPick:async({member,kind})=>{assertIdle();if(!['input','send','response','busy'].includes(kind))throw Error('Unknown field');return webWindow.pick(wizardMember(member),kind);},
   webWindowTest:async({member})=>{assertIdle();const m=wizardMember(member);validateMember(m);const response=await webWindow.send({member:m,prompt:'这是连接测试，请只回复：连接成功',signal:AbortSignal.timeout(90000)});if(response.text.trim()!=='连接成功')throw Error('读到了内容，但不符合测试回复。请确认选中的是 AI 回复区域，然后重试。');return {message:'发送与读取测试通过。请保存成员。'};},
+  windowState:()=>({fullscreen:win.isFullScreen(),zoom:win.webContents.getZoomFactor()}),
+  windowAction:({action})=>{require('./window-controls.cjs').action(win,action);return true;},
   nativeLanguage:({language})=>{if(!['zh','en'].includes(language))throw Error('Invalid language');require('./native-menu.cjs').install({Menu,app,window:win,language});return true;},
   dataLocation:()=>({current:dataRoot,pending:qa?'':dataLocation.read(portableRoot).pending||''}),
   dataLocationChoose:async()=>{assertIdle();const result=await dialog.showOpenDialog(win,{title:'选择空文件夹 · 下次启动复制迁移，保留原数据',properties:['openDirectory','createDirectory']});if(result.canceled)return handlers.dataLocation();assertIdle();dataLocation.schedule(qa?dataRoot:portableRoot,dataRoot,result.filePaths[0]);return {current:dataRoot,pending:result.filePaths[0]};},
@@ -72,9 +74,11 @@ const handlers={
   modelCatalog:()=>modelCatalog.list(),
   modelCatalogSave:({memberId,models})=>{assertIdle();return modelCatalog.save(memberId,models);},
   modelCatalogFetch:async({memberId})=>{const m=settings.members.find(m=>m.id===memberId);if(!m||m.kind!=='api')throw Error('请选择 API 连接。');return api.models(m);},
+  modelCapability:({member})=>require('./model-capabilities.cjs').capability(member||{}),
   providerCatalog:()=>require('./ui/provider-catalog.json'),
   appIcon:async()=> (await app.getFileIcon(process.execPath,{size:'large'})).toDataURL(),
   desktopShortcut:()=>{if(!app.isPackaged)throw Error('Please use the portable release to create a shortcut.');return require('./desktop-shortcut.cjs').create({shell,desktop:app.getPath('desktop'),executable:process.execPath});},
+  membersState:()=>({members:state().members,active:state().active}),
   deleteRoom:async({id,all=false})=>{assertIdle();const targets=all?[...rooms]:[roomById(id)];const result=await dialog.showMessageBox(win,{type:'warning',title:'确认删除聊天记录',message:all?`删除全部 ${targets.length} 个对话？`:`删除“${targets[0].title}”？`,detail:'将删除聊天内容及关联工作流运行记录，无法撤销。附件文件和已导出的文件会保留。',buttons:['取消','确认删除'],defaultId:0,cancelId:0,noLink:true});assertIdle();if(result.response!==1)return state();const ids=targets.map(r=>r.id);rooms=rooms.filter(r=>!ids.includes(r.id));workflows.purgeRoomRuns(ids);if(!rooms.length)rooms.push(newRoom());saveRooms();fs.copyFileSync(path.join(dataRoot,'rooms.json'),path.join(dataRoot,'rooms.json.bak'));return state();},
   providerDocs:({id})=>{const p=require('./ui/provider-catalog.json')[id];if(!p)throw Error('未知服务商');return shell.openExternal(p.docs);},
   state:()=>state(),
@@ -92,13 +96,17 @@ const handlers={
   renameRoom:({id,title})=>{assertIdle();roomById(id).title=String(title).slice(0,100)||'未命名讨论';saveRooms();return state();},
   saveMember:({member,key,clearKey})=>{
     assertIdle();stableMember(member);const clean=validateMember(member);const existing=settings.members.find(x=>x.id===clean.id);
+    if(clean.kind==='api'){const c=require('./model-capabilities.cjs').capability(clean);clean.vision=c.status==='supported'||c.status==='unknown'&&existing?.baseUrl===clean.baseUrl&&existing?.model===clean.model&&existing?.format===clean.format&&existing?.vision===true;}
     if(!existing&&settings.members.length>=20)throw Error('最多添加 20 位成员。');
+    if(clean.apiLabel!==undefined&&(typeof clean.apiLabel!=='string'||clean.apiLabel.length>60))throw Error('API 名称最多 60 字。');
+    if(clean.apiParent&&!settings.members.some(m=>m.id===clean.apiParent&&m.kind==='api'&&m.id!==clean.id&&!m.apiParent&&m.baseUrl===clean.baseUrl&&m.format===clean.format))throw Error('所属成员必须是同地址、同协议的 API 成员。');
     if(key){if(!safeStorage.isEncryptionAvailable())throw Error('Windows 密钥加密不可用，不能保存密钥。');if(typeof key!=='string'||key.length>4096)throw Error('密钥格式异常。');secrets[clean.id]=safeStorage.encryptString(key.trim()).toString('base64');}
     else if(clearKey||existing?.baseUrl!==clean.baseUrl||clean.kind!=='api')delete secrets[clean.id];
     if(existing)settings.members=settings.members.map(x=>x.id===clean.id?clean:x);else settings.members.push(clean);
+    if(clean.apiParent)settings.members=settings.members.map(m=>m.id===clean.apiParent?{...m,apiPool:[...new Set([...(m.apiPool||[]),clean.id])]}:m);
     store.write('secrets',secrets);store.write('settings',settings);return state();
   },
-  removeMember:({id})=>{assertIdle();settings.members=settings.members.filter(m=>m.id!==id);delete secrets[id];store.write('settings',settings);store.write('secrets',secrets);return state();},
+  removeMember:({id})=>{assertIdle();settings.members=settings.members.filter(m=>m.id!==id).map(m=>m.apiPool?{...m,apiPool:m.apiPool.filter(x=>x!==id)}:m);const children=settings.members.filter(m=>m.apiParent===id);if(children.length){const next=children[0].id;settings.members=settings.members.map(m=>m.apiParent===id?{...m,apiParent:m.id===next?undefined:next,...(m.id===next?{apiPool:[...new Set([...(m.apiPool||[]),...children.slice(1).map(x=>x.id)])]}:{})}:m);}delete secrets[id];store.write('settings',settings);store.write('secrets',secrets);return state();},
   models:({id})=>api.models(memberById(id)),
   discoverModels:async({member,key})=>{const m=validateMember({...member,model:'model-list'});if(m.kind!=='api')throw Error('请选择 API 接入。');const saved=settings.members.find(x=>x.id===m.id);if(key!==undefined&&(typeof key!=='string'||key.length>4096))throw Error('密钥格式异常。');const value=key?.trim()||(saved?.baseUrl===m.baseUrl?unlocked(m.id):'');if(!value&&!['localhost','127.0.0.1','[::1]'].includes(new URL(m.baseUrl).hostname))throw Error('请先填写该服务商的 API 密钥。');return new ApiAdapter({getKey:()=>value,fetchImpl:(...args)=>net.fetch(...args)}).models(m);},
   chooseExe:async()=>{const r=await dialog.showOpenDialog(win,{title:'选择可执行程序',properties:['openFile'],filters:[{name:'可执行程序',extensions:['exe']}]});return r.canceled?'':r.filePaths[0];},
@@ -147,7 +155,8 @@ else {
     const network=new NetworkTools({fetchImpl:(...args)=>net.fetch(...args),getSearchKey:()=>unlocked('network:tavily'),getSearchConfig:()=>({provider:settings.searchProvider||'tavily',url:settings.searchUrl||''})});
     api=new ApiAdapter({getKey:unlocked,fetchImpl:(...args)=>net.fetch(...args),timeout:options.timeout,network,isNetworkEnabled:()=>settings.networkEnabled===true});codex=new CodexAdapter(options);terminal=new TerminalAdapter(options);
     attachments=new Attachments({store,root:path.join(dataRoot,'attachments'),BrowserWindow,ipcMain,dialog,shell,window:()=>win,assertIdle,onChange:(scope,list)=>{if(scope.startsWith('room:')){const r=roomById(scope.slice(5));r.materials=[...r.materials.filter(m=>!m.attachmentId),...list];saveRooms();}}});
-    const dispatch=async p=>{stableMember(p.member);if(!p.skillsPrepared)p=skills.prepare(p);p=attachments.prepare(p);const m=p.member;const result=await (m.kind==='codex'?codex:m.kind==='api'?api:m.kind==='terminal'?terminal:m.webMode==='automation'?(m.webTransport==='window'?webWindow:bridge):manual).send(p);return {...result,skills:p.skills};};
+    const routedApi=new (require('./api-connections.cjs').ApiConnections)({getMembers:()=>settings.members.filter(m=>m.kind!=='api'||secrets[m.id]||['localhost','127.0.0.1','[::1]'].includes(new URL(m.baseUrl).hostname)),getCatalog:()=>modelCatalog.list(),send:p=>api.send(p)});
+    const dispatch=async p=>{stableMember(p.member);if(p.member.kind==='api'&&require('./model-capabilities.cjs').capability(p.member).status==='supported')p={...p,member:{...p.member,vision:true}};if(!p.skillsPrepared)p=skills.prepare(p);p=attachments.prepare(p);const m=p.member;const result=await (m.kind==='codex'?codex:m.kind==='api'?routedApi:m.kind==='terminal'?terminal:m.webMode==='automation'?(m.webTransport==='window'?webWindow:bridge):manual).send(p);return {...result,skills:p.skills};};
     engine=new Discussion({getAdapter:()=>({send:dispatch}),persist:saveRooms,emit});
     workflows=createWorkflows({store,prepare:p=>skills.prepare(p),getSkillStamp:()=>JSON.stringify(skills.list()),getMembers:()=>settings.members,getAttachments:id=>attachments.list('workflow:'+id),assertIdle,dialog,window:()=>win,emit,onRun:(run,persist)=>{if(!run.roomId)return;const room=rooms.find(r=>r.id===run.roomId);if(!room)return;syncRunToRoom(run,room,emit,settings.members);if(persist)saveRooms();if(run.status!=='running')emit({type:'idle',roomId:room.id});},
       preflight:m=>{stableMember(m);validateMember(m);if(m.kind==='api'&&!secrets[m.id]&&!['localhost','127.0.0.1','[::1]'].includes(new URL(m.baseUrl).hostname))throw Error(m.name+' 尚未填写 API 密钥。');if(m.kind==='web'&&m.webMode==='automation'&&!webConnected(m))throw Error(m.name+' 网页桥未连接。');},
@@ -158,6 +167,7 @@ else {
       try{return {ok:true,value:await fn(args)};}catch(e){return {ok:false,error:e.message};}
     });
     win=new BrowserWindow({width:1260,height:850,minWidth:950,minHeight:650,show:!qa,backgroundColor:'#f6f6f0',title:'同桌 AI · 讨论室',webPreferences:{preload:path.join(__dirname,'preload.cjs'),contextIsolation:true,nodeIntegration:false,sandbox:true}});
+    require('./window-controls.cjs').attach(win);
     win.webContents.setWindowOpenHandler(()=>({action:'deny'}));win.webContents.on('will-navigate',e=>e.preventDefault());
     win.on('close',()=>{engine.stop();workflows?.runner.stop();webWindow?.close();});
     await win.loadFile(path.join(__dirname,'ui/index.html'));

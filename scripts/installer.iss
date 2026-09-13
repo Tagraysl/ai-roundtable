@@ -5,7 +5,7 @@
   #error Output is required
 #endif
 #ifndef AppVersion
-  #define AppVersion "0.11.6"
+  #define AppVersion "0.11.7"
 #endif
 [Setup]
 AppId={{AF271D55-08E5-4D0A-947E-673EB620950C}

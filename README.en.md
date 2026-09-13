@@ -4,13 +4,20 @@
 
 [简体中文](README.md)
 
+
+This release also aligns page widths and forms, standardizes Manage AI / Discussion labels, and adds opaque fixed dialog headers. Esc exits full screen; Ctrl+= zooms in, Ctrl+- zooms out, and Ctrl+0 resets. Dark glass colors have a live preview. Completed workflow outputs appear separately in chat; switching workflows clears stale configuration notices.
+
+**New in 0.11.7:** streamed network-mode answers, concurrent independent tool queries and workflow nodes (including the same API/model), less repeated history rendering, and sticky close buttons and workflow controls. Workflow concurrency remains capped at three tasks; dependent nodes wait for their required inputs.
+
+In member settings, use **Add another connection**, save its key and models, then select it in the original connection's pool. Requests use available connections with the same endpoint/protocol and matching model. Set 1–3 concurrent requests per connection. Errors do not rotate keys. Multiple keys may share account quotas, so additional keys do not guarantee proportional speed gains.
+
 A local Windows app for AI collaboration. Continue with one model, or build visual workflows for planning, analysis, review and synthesis. Conversation history and collaboration mode are independent: switch models or workflows when returning to a task.
 
-**0.11.6 — prerelease.** MIT licensed, independently developed, not affiliated with model providers.
+**0.11.7 — prerelease.** MIT licensed, independently developed, not affiliated with model providers.
 
 ## Get started
 
-**Recommended: download `AI-Roundtable-0.11.6-Setup-x64.exe`.** Run the setup wizard, choose an installation folder and keep the desktop shortcut option selected. It installs for the current user without administrator privileges. Uninstalling retains user-created data and settings. Data from a separate portable installation is not imported automatically.
+**Recommended: download `AI-Roundtable-0.11.7-Setup-x64.exe`.** Run the setup wizard, choose an installation folder and keep the desktop shortcut option selected. It installs for the current user without administrator privileges. Uninstalling retains user-created data and settings. Data from a separate portable installation is not imported automatically.
 
 Alternatively, use the portable ZIP:
 
@@ -71,7 +78,7 @@ node --test tests/*.test.cjs
 ./scripts/release.ps1 -Download
 node scripts/verify-release.cjs
 # Replace the example path with this build's actual ZIP
-./scripts/build-installer.ps1 -PortableZip "dist/release-<id>/AI-Roundtable-0.11.6-windows-x64.zip" -DownloadCompiler
+./scripts/build-installer.ps1 -PortableZip "dist/release-<id>/AI-Roundtable-0.11.7-windows-x64.zip" -DownloadCompiler
 ```
 
 Core tests require no third-party dependencies. The build fetches and verifies a pinned Electron runtime. Output: `dist/release-<unique-id>/`. GitHub Actions tests and builds pushes and pull requests; maintainers review and attach ZIP files and checksums to versioned Releases. Use commits, branches and pull requests for changes, updating package.json and release notes.

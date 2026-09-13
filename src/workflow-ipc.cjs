@@ -14,6 +14,9 @@ function createWorkflows({store,getMembers,getAttachments=()=>[],getSkillStamp=(
   const save=g=>{const graph=cleanGraph(g);const i=graphs.findIndex(x=>x.id===graph.id);if(i<0)graphs.push(graph);else graphs[i]=graph;store.write('workflows',graphs);return graph;};
   const handlers={
     workflowState:()=>({graphs,runs,active:runner.active?.run.id||null,gate:gate.status()}),
+    workflowPoll:()=>({active:runner.active?.run.id||null,gate:gate.status()}),
+    workflowCatalogState:()=>({graphs}),
+    workflowErrorState:()=>({runs:runs.map(r=>({id:r.id,rootRunId:r.rootRunId,roomId:r.roomId,graph:{nodes:r.graph.nodes.map(n=>({id:n.id,title:n.title})),edges:r.graph.edges},nodes:Object.fromEntries(Object.entries(r.nodes).map(([id,n])=>[id,{status:n.status,memberId:n.memberId}]))}))}),
     workflowTemplate:({kind})=>{assertIdle();return template(kind);},
     workflowSave:({graph})=>{assertIdle();const existing=graphs.find(g=>g.id===graph.id);if(existing?.id.startsWith('builtin_')&&existing.name!==graph.name)graph={...graph,id:randomUUID()};return save(graph);},
     workflowDelete:async({id})=>{assertIdle();const g=graphs.find(g=>g.id===id);if(!g)throw Error('工作流不存在。');if(!await confirmDelete(`删除工作流“${g.name}”？`,'删除后无法撤销。已有聊天记录和运行结果会保留。'))return false;graphs=graphs.filter(g=>g.id!==id);overwrite('workflows',graphs);emit({type:'workflowCatalog'});return true;},
