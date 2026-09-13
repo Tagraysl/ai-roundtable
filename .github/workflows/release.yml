@@ -30,6 +30,12 @@ jobs:
           npm install --prefix "$RUNNER_TEMP/mac-test" playwright
           PLAYWRIGHT_PATH="$RUNNER_TEMP/mac-test/node_modules/playwright" node scripts/mac-smoke.cjs
       - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: macOS-${{ matrix.arch }}-screenshots
+          path: ${{ env.MAC_STAGE }}/mac-workflow.png
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
         with:
           name: macOS-${{ matrix.arch }}
           path: |
