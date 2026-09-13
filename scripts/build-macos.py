@@ -1,5 +1,5 @@
 """Build a clean, ad-hoc-signed macOS app, ZIP and drag-to-Applications DMG."""
-import hashlib, json, os, pathlib, plistlib, shutil, subprocess, sys, urllib.request, uuid
+import hashlib, json, os, pathlib, plistlib, shutil, subprocess, sys, time, urllib.request, uuid
 root=pathlib.Path(__file__).resolve().parents[1]
 assert sys.platform=='darwin', 'Build on macOS to preserve bundle links and signatures'
 arch=sys.argv[1];assert arch in ('arm64','x64')
@@ -32,7 +32,11 @@ subprocess.run(['ditto','-c','-k','--sequesterRsrc','--keepParent',str(app),str(
 dmgroot=stage/'disk';dmgroot.mkdir();subprocess.run(['ditto',str(app),str(dmgroot/app.name)],check=True)
 os.symlink('/Applications',dmgroot/'Applications')
 dmg=stage/f'AI-Roundtable-{version}-macOS-{arch}.dmg'
-subprocess.run(['hdiutil','create','-volname','AI Roundtable','-srcfolder',str(dmgroot),'-ov','-format','UDZO',str(dmg)],check=True)
+for attempt in range(3):
+    result=subprocess.run(['hdiutil','create','-volname','AI Roundtable','-srcfolder',str(dmgroot),'-fs','HFS+','-ov','-format','UDZO',str(dmg)],capture_output=True,text=True)
+    if result.returncode==0:break
+    if 'Resource busy' not in result.stderr or attempt==2:raise RuntimeError(result.stderr)
+    time.sleep(5*(attempt+1))
 subprocess.run(['hdiutil','verify',str(dmg)],check=True)
 (stage/f'macOS-{arch}-SHA256SUMS.txt').write_text(''.join(hashlib.sha256(p.read_bytes()).hexdigest()+'  '+p.name+'\n' for p in (zipfile,dmg)))
 if os.environ.get('GITHUB_ENV'):

@@ -2,7 +2,8 @@ const assert=require('node:assert/strict'),path=require('node:path'),fs=require(
 const {_electron}=require(process.env.PLAYWRIGHT_PATH);
 (async()=>{
  const env={...process.env};delete env.ELECTRON_RUN_AS_NODE;
- const app=await _electron.launch({executablePath:path.join(process.env.MAC_APP,'Contents/MacOS/Electron'),args:['--qa'],env});
+ // Hosted Mac runners do not provide the same GPU environment as a physical Mac.
+ const app=await _electron.launch({executablePath:path.join(process.env.MAC_APP,'Contents/MacOS/Electron'),args:['--qa','--disable-gpu'],env});
  try{
   const page=await app.firstWindow();page.setDefaultTimeout(20000);
   await page.locator('#preferences-open').waitFor();
