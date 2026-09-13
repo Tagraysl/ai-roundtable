@@ -26,6 +26,10 @@ const {_electron}=require(process.env.PLAYWRIGHT_PATH);
   await page.locator('#preferences-close').click();
   await page.locator('#workflow-nav').click();
   await page.locator('.wf-node').first().waitFor();
+  const toolbar=await page.locator('.wf-toolbar').evaluate(el=>{
+   const box=el.getBoundingClientRect();
+   return [...el.children].filter(c=>c.getClientRects().length).every(c=>{const r=c.getBoundingClientRect();return r.top>=box.top-1&&r.bottom<=box.bottom+1;});
+  });assert(toolbar,'Workflow controls must stay inside their toolbar background');
   await page.keyboard.press('Meta+-');await page.keyboard.press('Meta+0');
   const zoom=await app.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].webContents.getZoomFactor());assert.equal(zoom,1);
   const desktop=fs.mkdtempSync(path.join(os.tmpdir(),'roundtable-desktop-'));

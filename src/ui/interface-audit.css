@@ -13,4 +13,6 @@ html body>main,html body>#workflow{padding:20px 24px 16px;min-width:0;scrollbar-
 html body>main>header{margin-top:0;}
 html body>main>:is(header,.composer,.participants,#conversation-controls,.room-workflow-bar),
 html body>#workflow>:is(.wf-top,.wf-toolbar,.wf-body,.wf-navigation){width:100%;max-width:none;box-sizing:border-box;align-self:stretch;}
+/* On short Mac screens, scroll the page rather than squeezing toolbar backgrounds. */
+html body>#workflow>*{flex-shrink:0;}
 @media(prefers-reduced-motion:reduce){html body *,html body *::before,html body *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important;}}

@@ -5,9 +5,31 @@ on:
     tags: ['v*']
   pull_request:
   workflow_dispatch:
+    inputs:
+      publish_draft:
+        description: 'Upload verified packages to a draft release'
+        type: boolean
+        default: false
 permissions:
   contents: read
 jobs:
+  publish:
+    if: github.event_name == 'workflow_dispatch' && inputs.publish_draft && github.ref == 'refs/heads/main'
+    needs: [windows, macos]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: release-downloads
+      - name: Verify and upload draft
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: python3 scripts/upload-release-draft.py release-downloads
   macos:
     strategy:
       fail-fast: false
