@@ -174,7 +174,7 @@ else {
     await win.loadFile(path.join(__dirname,'ui/index.html'));
     if(location.error)dialog.showErrorBox('数据目录',location.error);
     if(qa){global.__qa={win,engine,store,settings,rooms,bridge,handlers,discoverCodex,codex};}
-  }).catch(e=>{dialog.showErrorBox('同桌 AI 启动失败',e.message);app.quit();});
+  }).catch(e=>{if(qa)console.error('QA startup failed:',e);else dialog.showErrorBox('同桌 AI 启动失败',e.message);app.quit();});
   app.on('window-all-closed',()=>app.quit());
   app.on('before-quit',()=>{engine?.stop();workflows?.runner.stop();bridge?.close();webWindow?.close();});
 }

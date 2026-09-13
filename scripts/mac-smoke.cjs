@@ -4,8 +4,15 @@ const {_electron}=require(process.env.PLAYWRIGHT_PATH);
  const env={...process.env};delete env.ELECTRON_RUN_AS_NODE;
  // Hosted Mac runners do not provide the same GPU environment as a physical Mac.
  const app=await _electron.launch({executablePath:path.join(process.env.MAC_APP,'Contents/MacOS/Electron'),args:['--qa','--disable-gpu'],env});
+ app.process().stderr.on('data',chunk=>process.stderr.write(chunk));
+ app.process().stdout.on('data',chunk=>process.stdout.write(chunk));
+ console.log(await app.evaluate(({app,BrowserWindow})=>{
+  app.on('before-quit',()=>console.log('QA before-quit'));
+  app.on('render-process-gone',(_,wc,details)=>console.error('QA renderer gone',details));
+  return {path:app.getAppPath(),packaged:app.isPackaged,windows:BrowserWindow.getAllWindows().map(w=>({title:w.getTitle(),url:w.webContents.getURL()}))};
+ }));
  try{
-  const page=await app.firstWindow();page.setDefaultTimeout(20000);
+  const page=await app.firstWindow();page.setDefaultTimeout(20000);console.log('QA initial page',page.url());
   await page.locator('#preferences-open').waitFor();
   await page.waitForFunction(()=>!!window.roundtable);
   const state=await page.evaluate(()=>window.roundtable.call('state'));
