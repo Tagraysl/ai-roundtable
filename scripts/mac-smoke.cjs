@@ -3,7 +3,8 @@ const {_electron}=require(process.env.PLAYWRIGHT_PATH);
 (async()=>{
  const env={...process.env};delete env.ELECTRON_RUN_AS_NODE;
  // Hosted Mac runners do not provide the same GPU environment as a physical Mac.
- const app=await _electron.launch({executablePath:path.join(process.env.MAC_APP,'Contents/MacOS/Electron'),args:['--qa','--disable-gpu'],env});
+ const app=await _electron.launch({executablePath:path.join(process.env.MAC_APP,'Contents/MacOS/AI-Roundtable'),args:['--qa','--disable-gpu'],env});
+ app.process().on('exit',(code,signal)=>console.log('QA process exit',{code,signal}));
  app.process().stderr.on('data',chunk=>process.stderr.write(chunk));
  app.process().stdout.on('data',chunk=>process.stdout.write(chunk));
  console.log(await app.evaluate(({app,BrowserWindow})=>{
@@ -28,10 +29,11 @@ const {_electron}=require(process.env.PLAYWRIGHT_PATH);
   await page.keyboard.press('Meta+-');await page.keyboard.press('Meta+0');
   const zoom=await app.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].webContents.getZoomFactor());assert.equal(zoom,1);
   const desktop=fs.mkdtempSync(path.join(os.tmpdir(),'roundtable-desktop-'));
-  const executable=path.join(process.env.MAC_APP,'Contents/MacOS/Electron');
+  const executable=path.join(process.env.MAC_APP,'Contents/MacOS/AI-Roundtable');
   const link=require('../src/desktop-shortcut.cjs').create({desktop,executable,platform:'darwin'});
   assert.equal(fs.realpathSync(link),fs.realpathSync(process.env.MAC_APP));
   await page.screenshot({path:path.join(process.env.MAC_STAGE,'mac-workflow.png')});
   console.log('PASS: packaged Mac app launches; isolated empty data; English workflow; Command zoom.');
- }finally{await app.close();}
+ }catch(e){console.error('QA failure process state',{exitCode:app.process().exitCode,signalCode:app.process().signalCode});throw e;}
+ finally{await app.close().catch(()=>{});}
 })().catch(e=>{console.error(e);process.exitCode=1;});

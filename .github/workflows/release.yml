@@ -29,6 +29,12 @@ jobs:
         run: |
           npm install --prefix "$RUNNER_TEMP/mac-test" playwright
           PLAYWRIGHT_PATH="$RUNNER_TEMP/mac-test/node_modules/playwright" node scripts/mac-smoke.cjs
+      - name: Mac crash diagnostics
+        if: failure()
+        run: |
+          find "$HOME/Library/Logs/DiagnosticReports" -maxdepth 1 -name '*Roundtable*' -o -name '*Electron*' | head -5 | while IFS= read -r report; do
+            head -80 "$report"
+          done
       - uses: actions/upload-artifact@v4
         if: always()
         with:

@@ -22,7 +22,9 @@ denied={'data','instance','qa','.git','node_modules','secrets.json','rooms.json'
 for p in target.rglob('*'):
     assert not p.is_symlink() and not (set(p.relative_to(target).parts)&denied),f'Unexpected release path: {p}'
 plist=app/'Contents'/'Info.plist';info=plistlib.loads(plist.read_bytes())
-info.update(CFBundleName='AI Roundtable',CFBundleDisplayName='AI Roundtable',CFBundleIdentifier='io.tagraysl.ai-roundtable',CFBundleShortVersionString=version,CFBundleVersion=version)
+oldExecutable=info['CFBundleExecutable']
+(app/'Contents'/'MacOS'/oldExecutable).rename(app/'Contents'/'MacOS'/'AI-Roundtable')
+info.update(CFBundleExecutable='AI-Roundtable',CFBundleName='AI Roundtable',CFBundleDisplayName='AI Roundtable',CFBundleIdentifier='io.tagraysl.ai-roundtable',CFBundleShortVersionString=version,CFBundleVersion=version)
 plist.write_bytes(plistlib.dumps(info))
 # Ad-hoc signing allows modified bundles on Apple silicon. It is NOT Developer ID signing/notarization.
 subprocess.run(['codesign','--force','--deep','--sign','-',str(app)],check=True)
