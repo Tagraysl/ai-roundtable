@@ -18,6 +18,7 @@ const {_electron}=require(process.env.PLAYWRIGHT_PATH);
   await page.waitForFunction(()=>!!window.roundtable);
   const state=await page.evaluate(()=>window.roundtable.call('state'));
   assert.equal(state.version,require('../package.json').version);
+  await page.waitForFunction(version=>document.querySelector('.sidebar-footer small').textContent.includes(version),state.version);
   assert(!state.dataRoot.startsWith(process.env.MAC_APP));
   assert(state.rooms.every(r=>!r.messages.length&&!(r.materials||[]).length));
   assert(state.members.every(m=>!m.hasKey));
@@ -36,6 +37,7 @@ const {_electron}=require(process.env.PLAYWRIGHT_PATH);
   const executable=path.join(process.env.MAC_APP,'Contents/MacOS/AI-Roundtable');
   const link=require('../src/desktop-shortcut.cjs').create({desktop,executable,platform:'darwin'});
   assert.equal(fs.realpathSync(link),fs.realpathSync(process.env.MAC_APP));
+  await page.waitForTimeout(500);
   await page.screenshot({path:path.join(process.env.MAC_STAGE,'mac-workflow.png')});
   console.log('PASS: packaged Mac app launches; isolated empty data; English workflow; Command zoom.');
  }catch(e){console.error('QA failure process state',{exitCode:app.process().exitCode,signalCode:app.process().signalCode});throw e;}

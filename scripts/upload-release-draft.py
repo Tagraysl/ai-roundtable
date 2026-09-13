@@ -14,6 +14,12 @@ for manifest in root.rglob('*SHA256SUMS.txt'):
     assets.append(manifest)
 assert len(assets)==11 and len({p.name for p in assets})==11, 'Expected Windows, source and both Mac builds'
 tag='v'+version
-subprocess.run(['gh','release','create',tag,'--target',subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'--title','同桌 AI / AI Roundtable '+version+' — Preview','--draft','--prerelease','--notes','Mac 双架构与单模型工作流 / macOS builds and single-model workflows. Final notes will be added after verification.'],check=True)
-subprocess.run(['gh','release','upload',tag,*map(str,assets)],check=True)
+commit=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
+existing=subprocess.run(['gh','release','view',tag,'--json','isDraft'],capture_output=True,text=True)
+if existing.returncode==0:
+    assert json.loads(existing.stdout)['isDraft'], 'Never overwrite a public release'
+    subprocess.run(['gh','release','edit',tag,'--target',commit],check=True)
+else:
+    subprocess.run(['gh','release','create',tag,'--target',commit,'--title','同桌 AI / AI Roundtable '+version+' — Preview','--draft','--prerelease','--notes','Mac 双架构与单模型工作流 / macOS builds and single-model workflows. Final notes will be added after verification.'],check=True)
+subprocess.run(['gh','release','upload',tag,'--clobber',*map(str,assets)],check=True)
 print('Draft uploaded: '+tag)

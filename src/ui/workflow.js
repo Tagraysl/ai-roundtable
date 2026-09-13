@@ -85,7 +85,7 @@
   };$('wf-fit').after(overview);
   const attachButton=make('button','＋ 附件 / 资料');attachButton.id='wf-attachments';attachButton.onclick=guard(async()=>{if(active)throw Error('请先停止运行再修改附件。');await window.attachmentUI.open('workflow:'+graph.id,files=>{attachButton.textContent=files.length?`附件 / 资料（${files.length}）`:'＋ 附件 / 资料';});});$('wf-directory').before(attachButton);
   setInterval(async()=>{if(!host.hidden&&graph){try{const files=await api('attachmentsList',{scope:'workflow:'+graph.id});attachButton.textContent=files.length?`附件 / 资料（${files.length}）`:'＋ 附件 / 资料';attachButton.disabled=active;}catch{}}},2000);
-  document.querySelector('.sidebar-footer small').textContent='AI Roundtable · 0.11.7';
+  api('state').then(s=>{document.querySelector('.sidebar-footer small').textContent='AI Roundtable · '+s.version;}).catch(()=>{});
   const help=make('details');help.className='workflow-help';help.append(make('summary','工作流使用帮助'));const guideText=host.querySelector('.wf-connect-guide'),usageText=host.querySelector('p.help');host.querySelector('.wf-toolbar').after(help);if(usageText)help.append(usageText);if(guideText)help.append(guideText);
   show(true);sync().catch(e=>note(e.message));
 })();
