@@ -65,7 +65,7 @@ bind('do-summary',async()=>{const id=$('summary-member').value;$('summary-dialog
 bind('bridge-help',()=>{$('web-links').replaceChildren();for(const m of state.members.filter(m=>m.kind==='web')){const b=el('button','打开 '+m.name+' ↗');b.onclick=()=>call('openWeb',{id:m.id}).catch(e=>notify(e.message));$('web-links').append(b);}$('bridge-dialog').showModal();});
 bind('extension-folder',()=>call('extensionFolder'));bind('copy-code',async()=>{await call('pair');$('copy-code').textContent='已复制 · 去浏览器扩展粘贴';});
 document.querySelectorAll('.close-dialog').forEach(b=>b.onclick=()=>b.closest('dialog').close());
-$('prompt').addEventListener('keydown',e=>{if(e.ctrlKey&&e.key==='Enter'){e.preventDefault();send().catch(e=>notify(e.message));}});
+$('prompt').addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();send().catch(e=>notify(e.message));}});
 let messageFrame=null;function scheduleMessages(){if(messageFrame!==null)return;messageFrame=setTimeout(()=>{messageFrame=null;renderMessages();},60);}
 window.roundtable.subscribe(e=>{
   if(!state)return;

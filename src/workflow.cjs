@@ -33,15 +33,13 @@ function validateGraph(raw,members,{runnable=true}={}){
   const mark=new Map();function visit(id){if(mark.get(id)===1)throw Error('存在循环连线。请展开为有限步骤；此版本不执行无限返工。');if(mark.has(id))return;mark.set(id,1);for(const p of parents(id))visit(p);mark.set(id,2);}for(const n of g.nodes)visit(n.id);
   if(g.nodes.filter(n=>n.type==='input').length!==1)issues.push({message:'需要且只能有一个任务输入节点。'});
   if(!g.nodes.some(n=>n.type==='output'))issues.push({message:'请添加最终输出节点。'});
-  const used=new Set();
   for(const n of g.nodes){
     if(n.type!=='input'&&!parents(n.id).length)issues.push({nodeId:n.id,message:`「${n.title}」尚未连接输入。`});
     if(n.type==='input'&&parents(n.id).length)issues.push({nodeId:n.id,message:'任务输入节点不能连接上游。'});
     if(n.type==='output'&&g.edges.some(e=>e[0]===n.id))issues.push({nodeId:n.id,message:'最终输出不能作为其他节点的输入。'});
     if(n.type!=='output'&&!g.edges.some(e=>e[0]===n.id))issues.push({nodeId:n.id,message:`「${n.title}」没有流向最终输出。`});
-    if(needsAI(n)){const id=resolveMember(g,n),m=members.find(m=>m.id===id);if(!m)issues.push({nodeId:n.id,message:`「${n.title}」需要选择 AI。`});else{used.add(id+'::'+(resolveModel(g,n)||m.model||''));if(resolveModel(g,n)&&!['api','codex'].includes(m.kind))issues.push({nodeId:n.id,message:'此接入方式不能通过本程序指定模型。'});if(n.type==='execute'&&m.kind!=='codex'&&!(m.kind==='terminal'&&m.executionCapable===true))issues.push({nodeId:n.id,message:`「${n.title}」需要选择 Codex 或已启用执行能力的本地终端智能体。`});}}
+    if(needsAI(n)){const id=resolveMember(g,n),m=members.find(m=>m.id===id);if(!m)issues.push({nodeId:n.id,message:`「${n.title}」需要选择 AI。`});else{if(resolveModel(g,n)&&!['api','codex'].includes(m.kind))issues.push({nodeId:n.id,message:'此接入方式不能通过本程序指定模型。'});if(n.type==='execute'&&m.kind!=='codex'&&!(m.kind==='terminal'&&m.executionCapable===true))issues.push({nodeId:n.id,message:`「${n.title}」需要选择 Codex 或已启用执行能力的本地终端智能体。`});}}
   }
-  if(runnable&&used.size<2)issues.push({message:'协作工作流至少需要两个不同成员或模型。'});
   return {graph:g,issues:runnable?issues:[]};
 }
 class WorkflowRunner{

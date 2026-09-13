@@ -20,7 +20,8 @@ const {Attachments,attachmentNote}=require('./attachments.cjs');
 let attachments;
 const qa=process.argv.includes('--qa');
 const sourceRoot=path.resolve(__dirname,'..');
-const portableRoot=app.isPackaged?path.dirname(process.execPath):sourceRoot;
+const portableRoot=require('./platform-paths.cjs').storageRoot({packaged:app.isPackaged,executable:process.execPath,sourceRoot,appData:app.getPath('appData'),qa,temp:app.getPath('temp')});
+fs.mkdirSync(portableRoot,{recursive:true});
 app.setPath('userData',path.join(portableRoot,'instance'));
 const primary=qa||app.requestSingleInstanceLock();
 const dataLocation=require('./data-location.cjs');
@@ -31,7 +32,7 @@ app.setName('AI Roundtable');
 let win,store,settings,rooms,secrets,bridge,engine,api,codex,terminal;
 function emit(event){if(win&&!win.isDestroyed())win.webContents.send('roundtable:event',event);}
 function saveRooms(){store.write('rooms',rooms);}
-function unlocked(id){const s=secrets[id];if(!s)return '';try{return safeStorage.decryptString(Buffer.from(s,'base64'));}catch{throw Error('API 密钥无法在当前 Windows 账户解密，请重新填写。');}}
+function unlocked(id){const s=secrets[id];if(!s)return '';try{return safeStorage.decryptString(Buffer.from(s,'base64'));}catch{throw Error('API 密钥无法在当前系统账户解密，请重新填写。');}}
 function state(){return {members:settings.members.map(m=>({...m,hasKey:!!secrets[m.id],connected:m.kind==='web'?webConnected(m):undefined})),rooms,active:engine.active?{roomId:engine.active.roomId}:workflows?.runner.active?{roomId:workflows.runner.active.run.roomId||null,workflow:true}:null,bridgePort:bridge.port,dataRoot,version:app.getVersion()};}
 function assertIdle(){if(engine.active||workflows?.runner.active||attachments?.busy||webWindow?.busy)throw Error('请先停止或等待当前讨论、工作流或附件解析完成。');}
 function roomById(id){const r=rooms.find(r=>r.id===id);if(!r)throw Error('讨论不存在。');return r;}
@@ -70,13 +71,13 @@ const handlers={
   dataLocationChoose:async()=>{assertIdle();const result=await dialog.showOpenDialog(win,{title:'选择空文件夹 · 下次启动复制迁移，保留原数据',properties:['openDirectory','createDirectory']});if(result.canceled)return handlers.dataLocation();assertIdle();dataLocation.schedule(qa?dataRoot:portableRoot,dataRoot,result.filePaths[0]);return {current:dataRoot,pending:result.filePaths[0]};},
   networkSettings:()=>({enabled:settings.networkEnabled===true,hasKey:!!secrets['network:tavily'],provider:settings.searchProvider||'tavily',url:settings.searchUrl||''}),
   networkDocs:()=>shell.openExternal('https://docs.tavily.com/documentation/quickstart'),
-  networkSave:({enabled,key,clearKey,provider='tavily',url=''})=>{assertIdle();if(!['tavily','searxng'].includes(provider))throw Error('未知搜索服务。');if(provider==='searxng'){const u=new URL(url);if(!['https:','http:'].includes(u.protocol)||u.username||u.password||u.search||u.hash)throw Error('请填写不含密码、参数的 HTTP(S) 服务地址。');url=u.href.replace(/\/$/,'');}settings.searchProvider=provider;settings.searchUrl=url;if(key){if(typeof key!=='string'||key.length>4096)throw Error('搜索密钥格式错误。');if(!safeStorage.isEncryptionAvailable())throw Error('Windows 密钥加密不可用。');secrets['network:tavily']=safeStorage.encryptString(key.trim()).toString('base64');}else if(clearKey)delete secrets['network:tavily'];settings.networkEnabled=enabled===true;store.write('secrets',secrets);store.write('settings',settings);return handlers.networkSettings();},
+  networkSave:({enabled,key,clearKey,provider='tavily',url=''})=>{assertIdle();if(!['tavily','searxng'].includes(provider))throw Error('未知搜索服务。');if(provider==='searxng'){const u=new URL(url);if(!['https:','http:'].includes(u.protocol)||u.username||u.password||u.search||u.hash)throw Error('请填写不含密码、参数的 HTTP(S) 服务地址。');url=u.href.replace(/\/$/,'');}settings.searchProvider=provider;settings.searchUrl=url;if(key){if(typeof key!=='string'||key.length>4096)throw Error('搜索密钥格式错误。');if(!safeStorage.isEncryptionAvailable())throw Error('系统密钥加密不可用。');secrets['network:tavily']=safeStorage.encryptString(key.trim()).toString('base64');}else if(clearKey)delete secrets['network:tavily'];settings.networkEnabled=enabled===true;store.write('secrets',secrets);store.write('settings',settings);return handlers.networkSettings();},
   modelCatalog:()=>modelCatalog.list(),
   modelCatalogSave:({memberId,models})=>{assertIdle();return modelCatalog.save(memberId,models);},
   modelCatalogFetch:async({memberId})=>{const m=settings.members.find(m=>m.id===memberId);if(!m||m.kind!=='api')throw Error('请选择 API 连接。');return api.models(m);},
   modelCapability:({member})=>require('./model-capabilities.cjs').capability(member||{}),
   providerCatalog:()=>require('./ui/provider-catalog.json'),
-  appIcon:async()=> (await app.getFileIcon(process.execPath,{size:'large'})).toDataURL(),
+  appIcon:async()=> (await app.getFileIcon(process.platform==='darwin'?require('./platform-paths.cjs').appBundle(process.execPath):process.execPath,{size:'large'})).toDataURL(),
   desktopShortcut:()=>{if(!app.isPackaged)throw Error('Please use the portable release to create a shortcut.');return require('./desktop-shortcut.cjs').create({shell,desktop:app.getPath('desktop'),executable:process.execPath});},
   membersState:()=>({members:state().members,active:state().active}),
   deleteRoom:async({id,all=false})=>{assertIdle();const targets=all?[...rooms]:[roomById(id)];const result=await dialog.showMessageBox(win,{type:'warning',title:'确认删除聊天记录',message:all?`删除全部 ${targets.length} 个对话？`:`删除“${targets[0].title}”？`,detail:'将删除聊天内容及关联工作流运行记录，无法撤销。附件文件和已导出的文件会保留。',buttons:['取消','确认删除'],defaultId:0,cancelId:0,noLink:true});assertIdle();if(result.response!==1)return state();const ids=targets.map(r=>r.id);rooms=rooms.filter(r=>!ids.includes(r.id));workflows.purgeRoomRuns(ids);if(!rooms.length)rooms.push(newRoom());saveRooms();fs.copyFileSync(path.join(dataRoot,'rooms.json'),path.join(dataRoot,'rooms.json.bak'));return state();},
@@ -100,7 +101,7 @@ const handlers={
     if(!existing&&settings.members.length>=20)throw Error('最多添加 20 位成员。');
     if(clean.apiLabel!==undefined&&(typeof clean.apiLabel!=='string'||clean.apiLabel.length>60))throw Error('API 名称最多 60 字。');
     if(clean.apiParent&&!settings.members.some(m=>m.id===clean.apiParent&&m.kind==='api'&&m.id!==clean.id&&!m.apiParent&&m.baseUrl===clean.baseUrl&&m.format===clean.format))throw Error('所属成员必须是同地址、同协议的 API 成员。');
-    if(key){if(!safeStorage.isEncryptionAvailable())throw Error('Windows 密钥加密不可用，不能保存密钥。');if(typeof key!=='string'||key.length>4096)throw Error('密钥格式异常。');secrets[clean.id]=safeStorage.encryptString(key.trim()).toString('base64');}
+    if(key){if(!safeStorage.isEncryptionAvailable())throw Error('系统密钥加密不可用，不能保存密钥。');if(typeof key!=='string'||key.length>4096)throw Error('密钥格式异常。');secrets[clean.id]=safeStorage.encryptString(key.trim()).toString('base64');}
     else if(clearKey||existing?.baseUrl!==clean.baseUrl||clean.kind!=='api')delete secrets[clean.id];
     if(existing)settings.members=settings.members.map(x=>x.id===clean.id?clean:x);else settings.members.push(clean);
     if(clean.apiParent)settings.members=settings.members.map(m=>m.id===clean.apiParent?{...m,apiPool:[...new Set([...(m.apiPool||[]),clean.id])]}:m);
@@ -109,7 +110,7 @@ const handlers={
   removeMember:({id})=>{assertIdle();settings.members=settings.members.filter(m=>m.id!==id).map(m=>m.apiPool?{...m,apiPool:m.apiPool.filter(x=>x!==id)}:m);const children=settings.members.filter(m=>m.apiParent===id);if(children.length){const next=children[0].id;settings.members=settings.members.map(m=>m.apiParent===id?{...m,apiParent:m.id===next?undefined:next,...(m.id===next?{apiPool:[...new Set([...(m.apiPool||[]),...children.slice(1).map(x=>x.id)])]}:{})}:m);}delete secrets[id];store.write('settings',settings);store.write('secrets',secrets);return state();},
   models:({id})=>api.models(memberById(id)),
   discoverModels:async({member,key})=>{const m=validateMember({...member,model:'model-list'});if(m.kind!=='api')throw Error('请选择 API 接入。');const saved=settings.members.find(x=>x.id===m.id);if(key!==undefined&&(typeof key!=='string'||key.length>4096))throw Error('密钥格式异常。');const value=key?.trim()||(saved?.baseUrl===m.baseUrl?unlocked(m.id):'');if(!value&&!['localhost','127.0.0.1','[::1]'].includes(new URL(m.baseUrl).hostname))throw Error('请先填写该服务商的 API 密钥。');return new ApiAdapter({getKey:()=>value,fetchImpl:(...args)=>net.fetch(...args)}).models(m);},
-  chooseExe:async()=>{const r=await dialog.showOpenDialog(win,{title:'选择可执行程序',properties:['openFile'],filters:[{name:'可执行程序',extensions:['exe']}]});return r.canceled?'':r.filePaths[0];},
+  chooseExe:async()=>{const r=await dialog.showOpenDialog(win,{title:'选择可执行程序',properties:['openFile'],...(process.platform==='win32'?{filters:[{name:'可执行程序',extensions:['exe']}]}:{})});return r.canceled?'':r.filePaths[0];},
   probe:async({id})=>{
     const m=memberById(id);
     if(m.kind==='codex')return codex.probe(m);

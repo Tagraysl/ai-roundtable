@@ -6,9 +6,9 @@ test('templates contain two independent plans, crossed reviews, approval and exe
  for(const type of ['duo','pipeline']){const g=template(type);Object.assign(g.roles,{a:'a',b:'b',executor:'c',reviewer:'b'});assert.deepEqual(validateGraph(g,members).issues,[]);assert.ok(g.nodes.some(n=>n.type==='execute'));}
  const g=template('duo');assert.ok(g.edges.some(e=>e[0]==='plan_b'&&e[1]==='review_a'));
 });
-test('validation points at missing AI and blocks cycles, single member and non-agent execution',()=>{
+test('validation allows a single member but rejects missing AI, cycles and non-agent execution',()=>{
  const g=graph();g.roles.b='';assert.ok(validateGraph(g,members).issues.some(x=>x.nodeId==='b'));
- g.roles.b='a';assert.ok(validateGraph(g,members).issues.some(x=>x.message.includes('两个不同')));
+ g.roles.b='a';assert.deepEqual(validateGraph(g,members).issues,[]);
  g.edges.push(['m','a']);assert.throws(()=>validateGraph(g,members),/循环/);
  const t=template('duo');Object.assign(t.roles,{a:'a',b:'b',executor:'a',reviewer:'b'});assert.ok(validateGraph(t,members).issues.some(x=>x.nodeId==='execute'));
 });

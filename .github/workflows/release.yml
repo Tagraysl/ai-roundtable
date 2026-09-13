@@ -8,6 +8,34 @@ on:
 permissions:
   contents: read
 jobs:
+  macos:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-15
+            arch: arm64
+          - runner: macos-15-intel
+            arch: x64
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test tests/*.test.cjs
+      - run: python3 scripts/build-macos.py ${{ matrix.arch }}
+      - name: Test packaged app
+        run: |
+          npm install --prefix "$RUNNER_TEMP/mac-test" playwright
+          PLAYWRIGHT_PATH="$RUNNER_TEMP/mac-test/node_modules/playwright" node scripts/mac-smoke.cjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macOS-${{ matrix.arch }}
+          path: |
+            ${{ env.MAC_STAGE }}/AI-Roundtable-*.zip
+            ${{ env.MAC_STAGE }}/AI-Roundtable-*.dmg
+            ${{ env.MAC_STAGE }}/macOS-*-SHA256SUMS.txt
   windows:
     runs-on: windows-latest
     steps:

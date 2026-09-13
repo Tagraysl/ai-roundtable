@@ -22,7 +22,7 @@ New-Item -ItemType Directory -Path $source | Out-Null
 $sourceEntries = @('src','extension','third-party','tests','docs','package.json','README.md','README.en.md','ARCHITECTURE.md','LICENSE','.gitignore','.github')
 foreach ($entry in $sourceEntries) { Copy-Item -LiteralPath (Join-Path $projectRoot $entry) -Destination $source -Recurse }
 New-Item -ItemType Directory -Path (Join-Path $source 'scripts') | Out-Null
-foreach ($entry in @('release.ps1','verify-release.cjs','Create-Desktop-Shortcut.ps1','Create-Desktop-Shortcut.cmd','build-installer.ps1','installer.iss')) { Copy-Item -LiteralPath (Join-Path $PSScriptRoot $entry) -Destination (Join-Path $source 'scripts') }
+foreach ($entry in @('release.ps1','verify-release.cjs','Create-Desktop-Shortcut.ps1','Create-Desktop-Shortcut.cmd','build-installer.ps1','installer.iss','build-macos.py','mac-smoke.cjs')) { Copy-Item -LiteralPath (Join-Path $PSScriptRoot $entry) -Destination (Join-Path $source 'scripts') }
 Expand-Archive -LiteralPath $archive -DestinationPath $portable
 Move-Item -LiteralPath (Join-Path $portable 'electron.exe') -Destination (Join-Path $portable 'AI-Roundtable.exe')
 $appDir = Join-Path $portable 'resources/app'

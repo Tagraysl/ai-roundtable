@@ -7,17 +7,21 @@
 
 This release also aligns page widths and forms, standardizes Manage AI / Discussion labels, and adds opaque fixed dialog headers. Esc exits full screen; Ctrl+= zooms in, Ctrl+- zooms out, and Ctrl+0 resets. Dark glass colors have a live preview. Completed workflow outputs appear separately in chat; switching workflows clears stale configuration notices.
 
-**New in 0.11.7:** streamed network-mode answers, concurrent independent tool queries and workflow nodes (including the same API/model), less repeated history rendering, and sticky close buttons and workflow controls. Workflow concurrency remains capped at three tasks; dependent nodes wait for their required inputs.
+**Response improvements:** streamed network-mode answers, concurrent independent tool queries and workflow nodes (including the same API/model), less repeated history rendering, and sticky close buttons and workflow controls. Workflow concurrency remains capped at three tasks; dependent nodes wait for their required inputs.
 
 In member settings, use **Add another connection**, save its key and models, then select it in the original connection's pool. Requests use available connections with the same endpoint/protocol and matching model. Set 1–3 concurrent requests per connection. Errors do not rotate keys. Multiple keys may share account quotas, so additional keys do not guarantee proportional speed gains.
 
-A local Windows app for AI collaboration. Continue with one model, or build visual workflows for planning, analysis, review and synthesis. Conversation history and collaboration mode are independent: switch models or workflows when returning to a task.
+A local Windows and macOS app for AI collaboration. Continue with one model, or build visual workflows for planning, analysis, review and synthesis. Conversation history and collaboration mode are independent: switch models or workflows when returning to a task.
 
-**0.11.7 — prerelease.** MIT licensed, independently developed, not affiliated with model providers.
+**0.11.8 — prerelease.** MIT licensed, independently developed, not affiliated with model providers.
 
 ## Get started
 
-**Recommended: download `AI-Roundtable-0.11.7-Setup-x64.exe`.** Run the setup wizard, choose an installation folder and keep the desktop shortcut option selected. It installs for the current user without administrator privileges. Uninstalling retains user-created data and settings. Data from a separate portable installation is not imported automatically.
+**Mac:** choose `macOS-arm64.dmg` for Apple silicon, or `macOS-x64.dmg` for Intel. Drag the app to Applications. ZIP alternatives are also available. Read the [Mac installation, storage and security notes](docs/macOS.md). The Mac preview has no Apple Developer ID signature or notarization.
+
+**Added in 0.11.8:** a single provider's single model can now run an entire workflow; two distinct models are no longer required. This release also adds macOS builds for both architectures.
+
+**Recommended: download `AI-Roundtable-0.11.8-Setup-x64.exe`.** Run the setup wizard, choose an installation folder and keep the desktop shortcut option selected. It installs for the current user without administrator privileges. Uninstalling retains user-created data and settings. Data from a separate portable installation is not imported automatically.
 
 Alternatively, use the portable ZIP:
 
@@ -28,7 +32,7 @@ Alternatively, use the portable ZIP:
 
 To create a desktop shortcut, run **Create-Desktop-Shortcut.cmd** after extraction, or select **Create desktop shortcut** in app settings. It uses the app icon and supports paths with spaces or Chinese characters. Recreate it after moving the app folder. Do not run it inside the ZIP.
 
-Windows x64 only. Both packages are unsigned, without automatic updates. Check INSTALLER-SHA256SUMS.txt for the installer or SHA256SUMS.txt for ZIP files; do not disable system protections. No app account is required.
+The EXE and windows-x64 ZIP are for Windows x64. They are unsigned, without automatic updates. Check INSTALLER-SHA256SUMS.txt for the installer or SHA256SUMS.txt for Windows/source ZIP files; Mac checksums are provided separately. Do not disable system protections. No app account is required.
 
 ## Features
 
@@ -63,7 +67,7 @@ Generic terminal and automated website connections are disabled. Arbitrary loops
 
 ## Privacy and upgrades
 
-History, settings and copied attachments live in the adjacent `data` folder by default, with relocation available in settings. Keys are encrypted for the current Windows account. There is no cloud sync. Selected context and files are sent to the chosen provider when running tasks; local storage does not mean offline inference.
+On Windows, history, settings and copied attachments live in the adjacent `data` folder by default. On Mac, they live in `~/Library/Application Support/AI Roundtable/data`. Relocation is available in settings. Keys are encrypted for the current operating-system account. There is no cloud sync. Selected context and files are sent to the chosen provider when running tasks; local storage does not mean offline inference.
 
 The release script builds in a new directory using a file allowlist, excluding developer credentials, conversations, attachments and browser sessions. Never publish your own `data`, `instance` or `data-location.json`.
 
@@ -78,7 +82,7 @@ node --test tests/*.test.cjs
 ./scripts/release.ps1 -Download
 node scripts/verify-release.cjs
 # Replace the example path with this build's actual ZIP
-./scripts/build-installer.ps1 -PortableZip "dist/release-<id>/AI-Roundtable-0.11.7-windows-x64.zip" -DownloadCompiler
+./scripts/build-installer.ps1 -PortableZip "dist/release-<id>/AI-Roundtable-0.11.8-windows-x64.zip" -DownloadCompiler
 ```
 
 Core tests require no third-party dependencies. The build fetches and verifies a pinned Electron runtime. Output: `dist/release-<unique-id>/`. GitHub Actions tests and builds pushes and pull requests; maintainers review and attach ZIP files and checksums to versioned Releases. Use commits, branches and pull requests for changes, updating package.json and release notes.

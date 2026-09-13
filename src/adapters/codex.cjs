@@ -4,8 +4,9 @@ const fs=require('node:fs');
 const path=require('node:path');
 function discoverCodex() {
   for(const dir of (process.env.PATH||'').split(path.delimiter)) {
-    const f=path.join(dir,'codex.exe'); if(fs.existsSync(f)) return f;
+    const f=path.join(dir,process.platform==='win32'?'codex.exe':'codex'); if(fs.existsSync(f)) return f;
   }
+  if(process.platform!=='win32'){for(const dir of ['/opt/homebrew/bin','/usr/local/bin']){const f=path.join(dir,'codex');if(fs.existsSync(f))return f;}return 'codex';}
   const base=path.join(process.env.LOCALAPPDATA||'','OpenAI','Codex','bin');
   try {
     const candidates=fs.readdirSync(base).map(p=>path.join(base,p,'codex.exe')).filter(p=>fs.existsSync(p));
@@ -18,6 +19,7 @@ class Rpc extends EventEmitter {
   constructor(executable,cwd) {
     super();this.seq=0;this.pending=new Map();this.closed=false;
     const env={...process.env}; delete env.ELECTRON_RUN_AS_NODE;
+    if(process.platform==='darwin')env.PATH=[env.PATH||'','/opt/homebrew/bin','/usr/local/bin','/usr/bin','/bin'].join(path.delimiter);
     this.child=spawn(executable||discoverCodex(),['app-server','--stdio'],{cwd,env,windowsHide:true,shell:false,stdio:['pipe','pipe','pipe']});
     let buf=''; this.child.stderr.resume(); this.child.stdin.on('error',()=>{});
     this.child.stdout.setEncoding('utf8');
@@ -33,7 +35,7 @@ class Rpc extends EventEmitter {
         } else this.emit('notice',msg);
       }
     });
-    this.child.on('error',()=>this.fail(Error('无法启动 Codex，请在设置中选择 codex.exe。')));
+    this.child.on('error',()=>this.fail(Error('无法启动 Codex，请在设置中选择 Codex 可执行程序。')));
     this.child.on('close',()=>this.fail(Error('Codex 进程已结束。')));
   }
   write(msg){if(!this.closed)this.child.stdin.write(JSON.stringify(msg)+'\n');}
