@@ -77,7 +77,7 @@ const handlers={
   modelCatalogFetch:async({memberId})=>{const m=settings.members.find(m=>m.id===memberId);if(!m||m.kind!=='api')throw Error('请选择 API 连接。');return api.models(m);},
   modelCapability:({member})=>require('./model-capabilities.cjs').capability(member||{}),
   providerCatalog:()=>require('./ui/provider-catalog.json'),
-  appIcon:async()=> (await app.getFileIcon(process.platform==='darwin'?require('./platform-paths.cjs').appBundle(process.execPath):process.execPath,{size:'large'})).toDataURL(),
+  appIcon:async()=> (await app.getFileIcon(process.platform==='darwin'?require('./platform-paths.cjs').appBundle(process.execPath):process.execPath,{size:process.platform==='darwin'?'normal':'large'})).toDataURL(),
   desktopShortcut:()=>{if(!app.isPackaged)throw Error('Please use the portable release to create a shortcut.');return require('./desktop-shortcut.cjs').create({shell,desktop:app.getPath('desktop'),executable:process.execPath});},
   membersState:()=>({members:state().members,active:state().active}),
   deleteRoom:async({id,all=false})=>{assertIdle();const targets=all?[...rooms]:[roomById(id)];const result=await dialog.showMessageBox(win,{type:'warning',title:'确认删除聊天记录',message:all?`删除全部 ${targets.length} 个对话？`:`删除“${targets[0].title}”？`,detail:'将删除聊天内容及关联工作流运行记录，无法撤销。附件文件和已导出的文件会保留。',buttons:['取消','确认删除'],defaultId:0,cancelId:0,noLink:true});assertIdle();if(result.response!==1)return state();const ids=targets.map(r=>r.id);rooms=rooms.filter(r=>!ids.includes(r.id));workflows.purgeRoomRuns(ids);if(!rooms.length)rooms.push(newRoom());saveRooms();fs.copyFileSync(path.join(dataRoot,'rooms.json'),path.join(dataRoot,'rooms.json.bak'));return state();},
